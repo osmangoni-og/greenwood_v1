@@ -1,0 +1,7 @@
+import { supabase, unwrap } from '@/lib/supabase';
+import type { AssetOfferRow, AssetPaymentRow, MonetizableAssetRow } from '@/types/database';
+
+export async function fetchAssets(projectId: string): Promise<MonetizableAssetRow[]> { return unwrap<MonetizableAssetRow[]>(await supabase.from('monetizable_assets').select('*').eq('project_id', projectId).order('created_at', { ascending: false })); }
+export async function fetchOffers(assetIds: string[]): Promise<AssetOfferRow[]> { if (!assetIds.length) return []; return unwrap<AssetOfferRow[]>(await supabase.from('asset_offers').select('*').in('asset_id', assetIds).order('offer_date', { ascending: false })); }
+export async function fetchPayments(assetIds: string[]): Promise<AssetPaymentRow[]> { if (!assetIds.length) return []; return unwrap<AssetPaymentRow[]>(await supabase.from('asset_payments').select('*').in('asset_id', assetIds).order('payment_date', { ascending: false })); }
+export async function transferAssetPayment(input: { assetId: string; offerId: string | null; amount: number; paymentDate: string; method: string; reference: string; notes: string; }): Promise<string> { const { data, error } = await supabase.rpc('record_asset_payment_and_transfer', { p_asset_id: input.assetId, p_offer_id: input.offerId, p_payment_amount_bdt: input.amount, p_payment_date: input.paymentDate, p_payment_method: input.method, p_payment_reference: input.reference || null, p_notes: input.notes || null }); if (error) throw new Error(error.message); return data as string; }
