@@ -85,7 +85,7 @@ export function BudgetVersionsPanel({ projectId, workspace, onChanged, view }: P
     const total = totalFor(version.id);
     const latest = versionRevisions.length > 0 ? versionRevisions[0] : null;
     const latestImpact = latest
-      ? `R${latest.revision_number}: ${formatTaka(Number(latest.new_total_bdt))} (${(Number(latest.new_total_bdt) > Number(latest.previous_total_bdt) ? '+' : '')}${((Number(latest.new_total_bdt) - Number(latest.previous_total_bdt)) / Math.max(Number(latest.previous_total_bdt), 1) * 100).toFixed(1)}%)`
+      ? `R${latest.revision_number}: ${formatTaka(Number(latest.new_total_bdt))}${Number(latest.previous_total_bdt) > 0 ? ` (${(Number(latest.new_total_bdt) > Number(latest.previous_total_bdt) ? '+' : '')}${((Number(latest.new_total_bdt) - Number(latest.previous_total_bdt)) / Number(latest.previous_total_bdt) * 100).toFixed(1)}%)` : ' (new baseline)'}`
       : null;
     return { lineCount, revisionCount, total, latestImpact };
   }
