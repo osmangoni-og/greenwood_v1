@@ -15,6 +15,8 @@ import { FundingPanel } from '@/pages/budget/FundingPanel';
 import { CommandCenterPanel } from '@/pages/budget/CommandCenterPanel';
 import { BudgetChartsPanel } from '@/pages/budget/BudgetChartsPanel';
 import { CashFlowForecastPanel } from '@/pages/budget/CashFlowForecastPanel';
+import { StructuralSummaryCards } from '@/pages/budget/StructuralSummaryCards';
+import { BudgetAuditTimeline } from '@/pages/budget/BudgetAuditTimeline';
 
 type BudgetTab = 'dashboard' | 'budget' | 'costs' | 'funding' | 'history';
 
@@ -58,6 +60,7 @@ export function BudgetManagementPage() {
     {tab === 'dashboard' && <div className="space-y-6">
       <BudgetOverview workspace={workspace} />
       <CommandCenterPanel workspace={workspace} />
+      <StructuralSummaryCards />
       <BudgetChartsPanel workspace={workspace} />
     </div>}
     {tab === 'budget' && <div className="space-y-6">
@@ -72,6 +75,9 @@ export function BudgetManagementPage() {
       <FundingPanel projectId={project.id} workspace={workspace} onChanged={reload} />
       <CashFlowForecastPanel workspace={workspace} />
     </div>}
-    {tab === 'history' && <BudgetVersionsPanel projectId={project.id} workspace={workspace} onChanged={reload} view="history" />}
+    {tab === 'history' && <div className="space-y-6">
+      <BudgetVersionsPanel projectId={project.id} workspace={workspace} onChanged={reload} view="history" />
+      <BudgetAuditTimeline projectId={project.id} />
+    </div>}
   </div>;
 }
