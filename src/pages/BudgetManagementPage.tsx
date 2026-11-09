@@ -16,7 +16,7 @@ import { CommandCenterPanel } from '@/pages/budget/CommandCenterPanel';
 import { BudgetChartsPanel } from '@/pages/budget/BudgetChartsPanel';
 import { CashFlowForecastPanel } from '@/pages/budget/CashFlowForecastPanel';
 
-type BudgetTab = 'overview' | 'command' | 'versions' | 'contingency' | 'purchasing' | 'suppliers' | 'funding' | 'charts' | 'cashflow';
+type BudgetTab = 'dashboard' | 'budget' | 'costs' | 'funding' | 'history';
 
 interface BudgetPageData {
   project: ProjectRow | null;
@@ -30,20 +30,16 @@ async function loadBudgetPage(): Promise<BudgetPageData> {
 }
 
 const TABS: { id: BudgetTab; label: string }[] = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'command', label: 'Command Center' },
-  { id: 'versions', label: 'Versions & Revisions' },
-  { id: 'contingency', label: 'Contingency' },
-  { id: 'purchasing', label: 'Purchasing' },
-  { id: 'suppliers', label: 'Supplier Ledger' },
+  { id: 'dashboard', label: 'Dashboard' },
+  { id: 'budget', label: 'Budget' },
+  { id: 'costs', label: 'Costs' },
   { id: 'funding', label: 'Funding' },
-  { id: 'charts', label: 'Charts' },
-  { id: 'cashflow', label: 'Cash Flow' },
+  { id: 'history', label: 'History' },
 ];
 
 export function BudgetManagementPage() {
   const { data, error, loading, reload } = useAsyncData(loadBudgetPage);
-  const [tab, setTab] = useState<BudgetTab>('overview');
+  const [tab, setTab] = useState<BudgetTab>('dashboard');
 
   if (loading && !data) return <LoadingState />;
   if (error) return <ErrorState message={error} onRetry={reload} />;
@@ -59,14 +55,23 @@ export function BudgetManagementPage() {
     <div className="flex gap-2 overflow-x-auto border-b border-stone-200 pb-px">
       {TABS.map((item) => <button key={item.id} type="button" onClick={() => setTab(item.id)} className={tab === item.id ? 'shrink-0 border-b-2 border-primary-700 px-4 py-2.5 text-sm font-medium text-primary-800' : 'shrink-0 border-b-2 border-transparent px-4 py-2.5 text-sm font-medium text-stone-500 hover:text-stone-800'}>{item.label}</button>)}
     </div>
-    {tab === 'overview' && <BudgetOverview workspace={workspace} />}
-    {tab === 'command' && <CommandCenterPanel workspace={workspace} />}
-    {tab === 'versions' && <BudgetVersionsPanel projectId={project.id} workspace={workspace} onChanged={reload} />}
-    {tab === 'contingency' && <ContingencyPanel projectId={project.id} workspace={workspace} onChanged={reload} />}
-    {tab === 'purchasing' && <PurchasingPanel projectId={project.id} workspace={workspace} onChanged={reload} />}
-    {tab === 'suppliers' && <SupplierLedgerPanel projectId={project.id} workspace={workspace} onChanged={reload} />}
-    {tab === 'funding' && <FundingPanel projectId={project.id} workspace={workspace} onChanged={reload} />}
-    {tab === 'charts' && <BudgetChartsPanel workspace={workspace} />}
-    {tab === 'cashflow' && <CashFlowForecastPanel workspace={workspace} />}
+    {tab === 'dashboard' && <div className="space-y-6">
+      <BudgetOverview workspace={workspace} />
+      <CommandCenterPanel workspace={workspace} />
+      <BudgetChartsPanel workspace={workspace} />
+    </div>}
+    {tab === 'budget' && <div className="space-y-6">
+      <BudgetVersionsPanel projectId={project.id} workspace={workspace} onChanged={reload} view="versions" />
+      <ContingencyPanel projectId={project.id} workspace={workspace} onChanged={reload} />
+    </div>}
+    {tab === 'costs' && <div className="space-y-6">
+      <PurchasingPanel projectId={project.id} workspace={workspace} onChanged={reload} />
+      <SupplierLedgerPanel projectId={project.id} workspace={workspace} onChanged={reload} />
+    </div>}
+    {tab === 'funding' && <div className="space-y-6">
+      <FundingPanel projectId={project.id} workspace={workspace} onChanged={reload} />
+      <CashFlowForecastPanel workspace={workspace} />
+    </div>}
+    {tab === 'history' && <BudgetVersionsPanel projectId={project.id} workspace={workspace} onChanged={reload} view="history" />}
   </div>;
 }

@@ -24,11 +24,12 @@ interface Props {
   projectId: string;
   workspace: BudgetWorkspace;
   onChanged: () => void;
+  view: 'versions' | 'history';
 }
 
 const STATUS_TONE: Record<BudgetVersionRow['status'], BadgeTone> = { draft: 'warning', approved: 'success', archived: 'neutral', superseded: 'neutral' };
 
-export function BudgetVersionsPanel({ projectId, workspace, onChanged }: Props) {
+export function BudgetVersionsPanel({ projectId, workspace, onChanged, view }: Props) {
   const [editing, setEditing] = useState<BudgetVersionRow | null>(null);
   const [editingMeta, setEditingMeta] = useState<BudgetVersionRow | null>(null);
   const [editingRevision, setEditingRevision] = useState<BudgetRevisionRow | null>(null);
@@ -135,7 +136,7 @@ export function BudgetVersionsPanel({ projectId, workspace, onChanged }: Props) 
   }
 
   return <div className="space-y-6">
-    <Card>
+    {view === 'versions' && <Card>
       <CardHeader title="Budget versions" description="Only one version is active at a time. Approved versions are locked; changes start a new draft." action={<Button onClick={startRevision} disabled={busy}><FilePlus2 className="h-4 w-4" aria-hidden /> {busy ? 'Creating...' : active ? 'Revise budget' : 'Create Budget V1'}</Button>} />
       {error && <p className="mt-3 rounded-xl bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
       {workspace.versions.length === 0 ? (
@@ -198,9 +199,9 @@ export function BudgetVersionsPanel({ projectId, workspace, onChanged }: Props) 
           })}
         </div>
       )}
-    </Card>
+    </Card>}
 
-    <Card>
+    {view === 'history' && <Card>
       <CardHeader title="Revision history" description="Every approved version is recorded with trigger type, reason, impact, and totals. Notes and impact can be edited after the fact." />
       {workspace.revisions.length === 0 ? (
         <p className="mt-4 text-sm text-stone-500">No revisions recorded yet.</p>
@@ -230,9 +231,9 @@ export function BudgetVersionsPanel({ projectId, workspace, onChanged }: Props) 
           </table>
         </div>
       )}
-    </Card>
+    </Card>}
 
-    {workspace.revisions.length > 0 && (
+    {view === 'history' && workspace.revisions.length > 0 && (
       <Card>
         <CardHeader title="Budget impact analysis" description="Impact amount, growth percentage, and cost driver for each revision." />
         <div className="mt-4 space-y-3">
